@@ -1,16 +1,17 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/vaccination.dart';
+import '../services/shared_prefs.dart';
 
 class VaccinationCertificateScreen extends StatefulWidget {
   const VaccinationCertificateScreen({super.key});
 
   @override
-  _VaccinationCertificateScreenState createState() => _VaccinationCertificateScreenState();
+  _VaccinationCertificateScreenState createState() =>
+      _VaccinationCertificateScreenState();
 }
 
-class _VaccinationCertificateScreenState extends State<VaccinationCertificateScreen> {
+class _VaccinationCertificateScreenState
+    extends State<VaccinationCertificateScreen> {
   List<Vaccination> vaccinations = [];
 
   @override
@@ -20,29 +21,48 @@ class _VaccinationCertificateScreenState extends State<VaccinationCertificateScr
   }
 
   Future<void> _loadVaccinations() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? vaccinationsJson = prefs.getString('vaccinations');
-
-    if (vaccinationsJson != null) {
-      List<dynamic> vaccinationList = jsonDecode(vaccinationsJson);
+    List<Vaccination> fetchedVaccinations =
+        await SharedPrefs.fetchPersonalVaccines();
+    if (fetchedVaccinations.isNotEmpty) {
       setState(() {
-        vaccinations = vaccinationList.map((v) => Vaccination.fromJson(v)).toList();
+        vaccinations = fetchedVaccinations;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Vaccination Certificate')),
-      body: vaccinations.isEmpty
-          ? const Center(child: Text('No Vaccinations Found'))
-          : ListView.builder(
-        itemCount: vaccinations.length,
-        itemBuilder: (context, index) {
-          final vaccination = vaccinations[index];
-          return VaccinationCard(vaccination: vaccination);
-        },
+    return SafeArea(
+      child: Scaffold(
+        body: vaccinations.isEmpty
+            ? const Center(
+                child: Text(
+                'No Vaccinations Found',
+                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              ))
+            : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "All Vaccinations",
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ),
+                    Expanded(
+                      // Wrap ListView.builder with Expanded
+                      child: ListView.builder(
+                        itemCount: vaccinations.length,
+                        itemBuilder: (context, index) {
+                          final vaccination = vaccinations[index];
+                          return VaccinationCard(vaccination: vaccination);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -56,7 +76,6 @@ class VaccinationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(10.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
       elevation: 5,
       child: ListTile(

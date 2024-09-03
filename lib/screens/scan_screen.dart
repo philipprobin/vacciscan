@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vacciscan/screens/vaccination_certificate_screen.dart';
+import '../main.dart';
 import '../models/vaccination.dart';
 import '../services/openai_api.dart';
+import '../services/shared_prefs.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -27,7 +27,6 @@ class _ScanScreenState extends State<ScanScreen> {
       });
     }
   }
-
 
   Future<void> _uploadImages() async {
     if (_images.isEmpty) return;
@@ -71,22 +70,19 @@ class _ScanScreenState extends State<ScanScreen> {
         );
       }).toList();
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('vaccinations', jsonEncode(vaccinations));
+      // Use the new addVaccinations method
+      await SharedPrefs.addVaccinations(vaccinations);
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const VaccinationCertificateScreen()),
-      );
+      HomeScreen.homeScreenKey.currentState?.setPage(0);
     } catch (e) {
-      print('Error during API call: $e'); // This will give more insight into the error
+      print(
+          'Error during API call: $e'); // This will give more insight into the error
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
   }
-
-
 
   void _deleteImage(int index) {
     setState(() {
@@ -96,59 +92,70 @@ class _ScanScreenState extends State<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Scan Vaccination Certificate')),
-      body: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                  ),
-                  itemCount: _images.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onLongPress: () => _deleteImage(index),
-                      child: Image.file(_images[index], fit: BoxFit.cover),
-                    );
-                  },
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (_images.isNotEmpty)
-                    _buildCustomIconButton(
-                      icon: Icons.upload,
-                      onPressed: () => _uploadImages(),
-                    ),
-                  _buildCustomIconButton(
-                    icon: Icons.camera_alt,
-                    onPressed: () => _pickImage(ImageSource.camera),
+
+                  const Text(
+                    "Scan your vaccination certificate",
+                    style:
+                    TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(width: 10),
-                  _buildCustomIconButton(
-                    icon: Icons.photo_library,
-                    onPressed: () => _pickImage(ImageSource.gallery),
+                  Expanded(
+                    child: GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                      ),
+                      itemCount: _images.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onLongPress: () => _deleteImage(index),
+                          child: Image.file(_images[index], fit: BoxFit.cover),
+                        );
+                      },
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (_images.isNotEmpty)
+                        _buildCustomIconButton(
+                          icon: Icons.upload,
+                          onPressed: () => _uploadImages(),
+                        ),
+                      _buildCustomIconButton(
+                        icon: Icons.camera_alt,
+                        onPressed: () => _pickImage(ImageSource.camera),
+                      ),
+                      const SizedBox(width: 10),
+                      _buildCustomIconButton(
+                        icon: Icons.photo_library,
+                        onPressed: () => _pickImage(ImageSource.gallery),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-          if (_isLoading)
-            const Center(
-              child: CircularProgressIndicator(),
             ),
-        ],
+            if (_isLoading)
+              const Center(
+                child: CircularProgressIndicator(),
+              ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildCustomIconButton({required IconData icon, required VoidCallback onPressed}) {
+  Widget _buildCustomIconButton(
+      {required IconData icon, required VoidCallback onPressed}) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(

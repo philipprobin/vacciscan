@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:vacciscan/util/app_colors.dart';
 import 'screens/vaccination_certificate_screen.dart';
 import 'screens/travel_vaccination_screen.dart';
 import 'screens/scan_screen.dart';
@@ -21,6 +22,8 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
+  static final GlobalKey<_HomeScreenState> homeScreenKey = GlobalKey<_HomeScreenState>();
+
   const HomeScreen({super.key});
 
   @override
@@ -36,19 +39,25 @@ class _HomeScreenState extends State<HomeScreen> {
     const TravelVaccinationScreen(),
   ];
 
+  void setPage(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
       bottomNavigationBar: ConvexAppBar(
         style: TabStyle.fixedCircle,
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.primaryColor, // Set the primary color here
         items: const [
           TabItem(icon: Icons.list_alt, title: 'Vac. Cert'),
           TabItem(icon: Icons.qr_code_scanner, title: ''),
           TabItem(icon: Icons.travel_explore, title: 'Travel'),
         ],
-        initialActiveIndex: 0, // Left tab selected by default
+        initialActiveIndex: _currentIndex,
         onTap: (int i) {
           setState(() {
             _currentIndex = i;
