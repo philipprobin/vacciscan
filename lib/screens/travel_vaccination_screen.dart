@@ -129,7 +129,7 @@ class _TravelVaccinationFormState extends State<TravelVaccinationForm> {
                 );
 
                 return Card(
-                  color: match ? AppColors.secondaryColor : null,
+                  color: match ? AppColors.green : null,
                   margin: const EdgeInsets.symmetric(vertical: 8.0),
                   child: ListTile(
                     title:

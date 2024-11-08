@@ -1,4 +1,4 @@
-name: vacciscan
+name: VaccineCheck
 description: "A new Flutter project."
 
 version: 1.0.0+1
@@ -15,13 +15,34 @@ dependencies:
   http: ^0.13.3
   convex_bottom_bar: ^3.0.0
   cupertino_icons: ^1.0.6
+  rename: ^3.0.2
+  rename_app: ^1.6.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.14.1
+  flutter_native_splash: ^2.4.1
+  change_app_package_name: ^1.4.0
+
+flutter_native_splash:
+  color: "#ffffff"  # Hintergrundfarbe des Splash Screens
+  image: assets/icons/app_icon.png  # Pfad zu deinem Bild (z. B. Logo oder Icon)
+  android: true
+  ios: true
+  android_gravity: center  # Position des Bildes auf Android
+  ios_content_mode: scaleAspectFill  # Position des Bildes auf iOS
+
+
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
 
 flutter:
   uses-material-design: true
   assets:
+    - assets/icons/app_icon.png
     - lib/assets/vaccine_info/vaccine_info_en.json

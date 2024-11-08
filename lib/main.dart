@@ -1,6 +1,6 @@
+import 'package:VaccineCheck/util/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:vacciscan/util/app_colors.dart';
 import 'screens/vaccination_certificate_screen.dart';
 import 'screens/travel_vaccination_screen.dart';
 import 'screens/scan_screen.dart';
