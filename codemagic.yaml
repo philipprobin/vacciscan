@@ -1,0 +1,27 @@
+workflows:
+  ios-method-1:
+    name: iOS signing
+    environment:
+      flutter: "3.22.3"  # Set the Flutter version to 3.22.3
+      groups:
+        - default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: app.vaccine.check
+    scripts:
+      - script: keychain initialize
+      - script: keychain add-certificates
+      - script: xcode-project use-profiles
+      - script: flutter pub get
+      - name: Flutter build ipa and automatic versioning
+        script: flutter build ipa --export-options-plist=/Users/builder/export_options.plist
+      - name: Upload to App Store Connect
+        script: |
+          xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --username "$APP_STORE_CONNECT_USERNAME" --password "$APP_STORE_CONNECT_PASSWORD"  
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      email:
+        recipients:
+          - philipprobinsowik@gmail.com
