@@ -1,11 +1,14 @@
 import 'package:VaccineCheck/util/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/vaccination_certificate_screen.dart';
 import 'screens/travel_vaccination_screen.dart';
 import 'screens/scan_screen.dart';
 
-void main() {
+Future<void> main() async {
+
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
