@@ -97,10 +97,44 @@ class _TravelVaccinationFormState extends State<TravelVaccinationForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Choose your destination country",
-            style:
-            TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              const Text(
+                "Choose your destination country",
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8.0), // Space between text and icon
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                tooltip: "Information source",
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("Source Information"),
+                        content: const Text(
+                          "The data is sourced from the Centers for Disease Control and Prevention (CDC), "
+                          "which is a U.S. federal public health agency under the Department of Health and Human Services.\n\n"
+                          "For more information, visit: https://wwwnc.cdc.gov/travel/destinations/list",
+                        ),
+                        actions: [
+                          TextButton(
+                            child: const Text("Close"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
           ),
           DropdownButton<String>(
             hint: const Text("Select a country"),
