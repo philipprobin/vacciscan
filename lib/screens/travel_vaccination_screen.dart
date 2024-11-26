@@ -7,7 +7,6 @@ import '../models/vaccination.dart';
 import '../models/vaccine_info.dart';
 import '../services/shared_prefs.dart';
 import '../services/vaccine_info_helper.dart';
-import '../util/app_colors.dart';
 import '../util/lang_converter.dart';
 
 class TravelVaccinationScreen extends StatelessWidget {
@@ -42,8 +41,8 @@ class _TravelVaccinationFormState extends State<TravelVaccinationForm> {
   }
 
   Future<void> loadCountries() async {
-    final String response = await rootBundle
-        .loadString('lib/assets/vaccine_info/vaccine_info_en.json');
+    final String response =
+    await rootBundle.loadString('lib/assets/vaccine_info/vaccine_info_en.json');
     final data = json.decode(response) as Map<String, dynamic>;
 
     setState(() {
@@ -66,13 +65,14 @@ class _TravelVaccinationFormState extends State<TravelVaccinationForm> {
       await prefs.setString('selectedCountry', selectedCountry!);
 
       final List<VaccineInfo> result =
-          await VaccineInfoHelper.getVaccineInfoForCountry(selectedCountry!);
+      await VaccineInfoHelper.getVaccineInfoForCountry(selectedCountry!);
       setState(() {
         vaccines = result
             .map((v) => {
-                  'Vaccines for disease': v.disease,
-                  'Recommendations': v.recommendations,
-                })
+          'Vaccines for disease': v.disease,
+          'Recommendations': v.recommendations,
+          'importance': v.importance,
+        })
             .toList();
       });
     }
@@ -80,7 +80,7 @@ class _TravelVaccinationFormState extends State<TravelVaccinationForm> {
 
   Future<void> loadPersonalVaccines() async {
     List<Vaccination> personalVaccines =
-        await SharedPrefs.fetchPersonalVaccines();
+    await SharedPrefs.fetchPersonalVaccines();
     List<String> diseases = [];
     for (Vaccination vaccine in personalVaccines) {
       diseases.add(vaccine.against);
@@ -92,11 +92,46 @@ class _TravelVaccinationFormState extends State<TravelVaccinationForm> {
 
   @override
   Widget build(BuildContext context) {
+    // Group vaccines into categories
+    Map<String, List<Map<String, String>>> groupedVaccines = {
+      'red': [],
+      'yellow': [],
+      'green': [],
+    };
+
+    for (var vaccineInfo in vaccines) {
+      final diseaseTranslated = LangConverter.diseaseTranslation[
+      vaccineInfo['Vaccines for disease'] ?? ''] ??
+          vaccineInfo['Vaccines for disease']!;
+      final match = _personalVaccines.contains(diseaseTranslated);
+
+      if (match) {
+        groupedVaccines['green']!.add(vaccineInfo);
+      } else if (vaccineInfo['importance'] == 'high') {
+        groupedVaccines['red']!.add(vaccineInfo);
+      } else if (vaccineInfo['importance'] == 'low') {
+        groupedVaccines['yellow']!.add(vaccineInfo);
+      }
+    }
+
+    final groupTitles = [
+      'Missing Vaccines',
+      'Optional Vaccines',
+      'Up-to-date Vaccines'
+    ];
+    final groupColors = [Colors.red, Colors.yellow, Colors.green];
+    final groupIcons = [
+      Icons.close, // Missing Vaccines
+      Icons.info,  // Optional Vaccines
+      Icons.check // Up-to-date Vaccines
+    ];
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header Row with Title and Info Icon
           Row(
             children: [
               const Text(
@@ -118,8 +153,8 @@ class _TravelVaccinationFormState extends State<TravelVaccinationForm> {
                         title: const Text("Source Information"),
                         content: const Text(
                           "The data is sourced from the Centers for Disease Control and Prevention (CDC), "
-                          "which is a U.S. federal public health agency under the Department of Health and Human Services.\n\n"
-                          "For more information, visit: https://wwwnc.cdc.gov/travel/destinations/list",
+                              "which is a U.S. federal public health agency under the Department of Health and Human Services.\n\n"
+                              "For more information, visit: https://wwwnc.cdc.gov/travel/destinations/list",
                         ),
                         actions: [
                           TextButton(
@@ -136,40 +171,87 @@ class _TravelVaccinationFormState extends State<TravelVaccinationForm> {
               ),
             ],
           ),
-          DropdownButton<String>(
-            hint: const Text("Select a country"),
-            value: selectedCountry,
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedCountry = newValue;
-                fetchVaccines(); // Fetch vaccines automatically
-              });
-            },
-            items: countries.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
+          const SizedBox(height: 8.0),
+          // Enhanced Dropdown Button
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade400),
+              borderRadius: BorderRadius.circular(8.0),
+              color: Colors.white,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                hint: const Text("Select a country"),
+                value: selectedCountry,
+                icon: const Icon(Icons.arrow_drop_down),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedCountry = newValue;
+                    fetchVaccines(); // Fetch vaccines automatically
+                  });
+                },
+                items: countries.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
+          const SizedBox(height: 16.0),
+          // Vaccine Groups
           Expanded(
-            child: ListView.builder(
-              itemCount: vaccines.length,
+            child: groupedVaccines.values.every((group) => group.isEmpty)
+                ? const Center(child: Text("No vaccine information available."))
+                : ListView.builder(
+              itemCount: groupTitles.length,
               itemBuilder: (context, index) {
-                final vaccineInfo = vaccines[index];
-                final match = _personalVaccines.contains(
-                  LangConverter
-                      .diseaseTranslation[vaccineInfo['Vaccines for disease']],
-                );
+                final vaccineGroup = groupedVaccines[
+                index == 0 ? 'red' : index == 1 ? 'yellow' : 'green']!;
 
-                return Card(
-                  color: match ? AppColors.green : null,
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    title:
-                        Text("Vaccine: ${vaccineInfo['Vaccines for disease']}"),
-                    subtitle: Text(
-                        "Recommendations: ${vaccineInfo['Recommendations']}"),
+                if (vaccineGroup.isEmpty) return const SizedBox.shrink();
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Card(
+                    elevation: 2.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: ExpansionTile(
+                      leading: CircleAvatar(
+                        backgroundColor: groupColors[index],
+                        child: Icon(
+                          groupIcons[index],
+                          color: Colors.white,
+                          size: 20.0,
+                        ),
+                      ),
+                      title: Text(
+                        groupTitles[index],
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      children: vaccineGroup.map((vaccine) {
+                        return ListTile(
+                          title: Text(
+                            "${vaccine['Vaccines for disease']}",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold),
+                          ),
+                          subtitle:
+                          Text("${vaccine['Recommendations']}"),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 );
               },

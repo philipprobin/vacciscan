@@ -36,53 +36,62 @@ class _ScanScreenState extends State<ScanScreen> {
     });
 
     try {
-      String imagePath = _images.first.path;
+      List<Vaccination> allVaccinations = [];
 
-      // Convert the image to base64
-      File imageFile = File(imagePath);
-      String imageBase64 = base64Encode(await imageFile.readAsBytes());
+      for (var image in _images) {
+        String imagePath = image.path;
 
-      var result = await OpenAIApi().extractVaccineInfo(imageBase64);
+        // Convert the image to base64
+        File imageFile = File(imagePath);
+        String imageBase64 = base64Encode(await imageFile.readAsBytes());
 
-      // Check the raw API response
-      print('API Response: $result');
+        var result = await OpenAIApi().extractVaccineInfo(imageBase64);
 
-      // Navigate through the response to get the vaccinations data
-      var toolCalls = result['choices'][0]['message']['tool_calls'];
-      if (toolCalls == null || toolCalls.isEmpty) {
-        print('No tool calls found in the response.');
-        return;
+        // Check the raw API response
+        print('API Response: $result');
+
+        // Navigate through the response to get the vaccinations data
+        var toolCalls = result['choices'][0]['message']['tool_calls'];
+        if (toolCalls == null || toolCalls.isEmpty) {
+          print('No tool calls found in the response for image: $imagePath');
+          continue; // Skip to the next image
+        }
+
+        var arguments = jsonDecode(toolCalls[0]['function']['arguments']);
+        List<dynamic> vaccinationsData = arguments['vaccinations'] ?? [];
+
+        if (vaccinationsData.isEmpty) {
+          print('No vaccinations data found in the response for image: $imagePath');
+          continue; // Handle the case when no data is available for the current image
+        }
+
+        List<Vaccination> vaccinations = vaccinationsData.map((v) {
+          return Vaccination(
+            brand: v['name_of_vaccine'] ?? 'Unknown',
+            against: v['vaccination_against'] ?? 'Unknown',
+            date: v['date'] ?? 'Unknown',
+          );
+        }).toList();
+
+        allVaccinations.addAll(vaccinations);
       }
 
-      var arguments = jsonDecode(toolCalls[0]['function']['arguments']);
-      List<dynamic> vaccinationsData = arguments['vaccinations'] ?? [];
-
-      if (vaccinationsData.isEmpty) {
-        print('No vaccinations data found in the response.');
-        return; // Handle the case when no data is available
+      if (allVaccinations.isNotEmpty) {
+        // Save all vaccinations at once
+        await SharedPrefs.addVaccinations(allVaccinations);
+        HomeScreen.homeScreenKey.currentState?.setPage(0);
+      } else {
+        print('No vaccinations found in any of the images.');
       }
-
-      List<Vaccination> vaccinations = vaccinationsData.map((v) {
-        return Vaccination(
-          v['name_of_vaccine'] ?? 'Unknown',
-          v['vaccination_against'] ?? 'Unknown',
-          v['date'] ?? 'Unknown',
-        );
-      }).toList();
-
-      // Use the new addVaccinations method
-      await SharedPrefs.addVaccinations(vaccinations);
-
-      HomeScreen.homeScreenKey.currentState?.setPage(0);
     } catch (e) {
-      print(
-          'Error during API call: $e'); // This will give more insight into the error
+      print('Error during API call: $e'); // This will give more insight into the error
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
   }
+
 
   void _deleteImage(int index) {
     setState(() {

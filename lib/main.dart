@@ -7,7 +7,6 @@ import 'screens/travel_vaccination_screen.dart';
 import 'screens/scan_screen.dart';
 
 Future<void> main() async {
-
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }

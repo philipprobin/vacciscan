@@ -13,7 +13,7 @@ class VaccineInfoHelper {
     }
 
     // Load and parse JSON file
-    final String response = await rootBundle.loadString('lib/assets/vaccine_info/vaccine_info_en.json');
+    final String response = await rootBundle.loadString('lib/assets/vaccine_info/vaccine_info_importance.json');
     final data = json.decode(response) as Map<String, dynamic>;
 
     // Convert JSON to VaccineInfo objects

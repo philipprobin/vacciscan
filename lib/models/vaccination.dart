@@ -3,13 +3,17 @@ class Vaccination {
   final String against;
   final String date;
 
-  Vaccination(this.brand, this.against, this.date);
+  Vaccination({
+    required this.brand,
+    required this.against,
+    required this.date,
+  });
 
   factory Vaccination.fromJson(Map<String, dynamic> json) {
     return Vaccination(
-      json['brand'],
-      json['against'],
-      json['date'],
+      brand: json['brand'],
+      against: json['against'],
+      date: json['date'],
     );
   }
 

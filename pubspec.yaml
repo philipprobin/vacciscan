@@ -48,3 +48,4 @@ flutter:
     - .env
     - assets/icons/app_icon.png
     - lib/assets/vaccine_info/vaccine_info_en.json
+    - lib/assets/vaccine_info/vaccine_info_importance.json
