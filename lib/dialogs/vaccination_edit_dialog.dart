@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/vaccination.dart';
+import '../services/shared_prefs.dart';
 
 class VaccinationEditDialog extends StatefulWidget {
   final Vaccination vaccination;
@@ -61,14 +62,18 @@ class _VaccinationEditDialogState extends State<VaccinationEditDialog> {
           child: const Text('Cancel'),
         ),
         TextButton(
-          onPressed: () {
-            Navigator.of(context).pop(
-              Vaccination(
-                brand: brandController.text,
-                against: againstController.text,
-                date: dateController.text,
-              ),
+          onPressed: () async {
+            Vaccination updatedVaccination = Vaccination(
+              brand: brandController.text,
+              against: againstController.text,
+              date: dateController.text,
             );
+
+            // Update the vaccination in SharedPreferences
+            await SharedPrefs.updateVaccination(widget.vaccination, updatedVaccination);
+
+            // Return the updated vaccination
+            Navigator.of(context).pop(updatedVaccination);
           },
           child: const Text('Save'),
         ),

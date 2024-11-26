@@ -100,10 +100,7 @@ class _TravelVaccinationFormState extends State<TravelVaccinationForm> {
     };
 
     for (var vaccineInfo in vaccines) {
-      final diseaseTranslated = LangConverter.diseaseTranslation[
-      vaccineInfo['Vaccines for disease'] ?? ''] ??
-          vaccineInfo['Vaccines for disease']!;
-      final match = _personalVaccines.contains(diseaseTranslated);
+      final match = _personalVaccines.contains(vaccineInfo['Vaccines for disease'] ??"");
 
       if (match) {
         groupedVaccines['green']!.add(vaccineInfo);
