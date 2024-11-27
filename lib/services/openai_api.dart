@@ -96,7 +96,10 @@ class OpenAIApi {
                             "Tetanus",
                             "Rabies",
                             "Typhoid",
-                            "Chickenpox (Varicella)"
+                            "Chickenpox (Varicella)",
+                            "Cholera",
+                            "Malaria",
+                            "Chikungunya"
                           ],
                           "description":
                               "The illness or condition that the vaccine is intended to protect against."

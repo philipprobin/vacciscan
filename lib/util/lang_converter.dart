@@ -1,21 +1,38 @@
 class LangConverter {
   List<String> english = [
-    'Meningitis (Meningococcal disease)',
-    'Tick-borne Encephalitis',
-    'Japanese Encephalitis',
-    'Polio',
-    'COVID-19',
-    'Hepatitis A',
-    'Rabies',
-    'Hepatitis B',
-    'Yellow Fever',
-    'Cholera',
-    'Typhoid',
-    'Measles',
-    'Routine vaccines',
-    'Chikungunya',
-    'Malaria'
+    "COVID-19",
+    "Dengue Fever",
+    "Diphtheria",
+    "Ebola",
+    "Tick-borne Encephalitis",
+    "Yellow Fever",
+    "Shingles",
+    "Haemophilus Influenzae Type B",
+    "Hepatitis A",
+    "Hepatitis B",
+    "HPV",
+    "Influenza",
+    "Japanese Encephalitis",
+    "Measles",
+    "Meningitis (Meningococcal disease)",
+    "Anthrax",
+    "Mumps",
+    "Pertussis (Whooping Cough)",
+    "Pneumococcal",
+    "Smallpox",
+    "Polio",
+    "Rubella",
+    "Rotavirus",
+    "RSV",
+    "Tetanus",
+    "Rabies",
+    "Typhoid",
+    "Chickenpox (Varicella)",
+    "Cholera",
+    "Malaria",
+    "Chikungunya"
   ];
+
   List<String> german = [
     "COVID-19",
     "Denguefieber",
@@ -44,7 +61,10 @@ class LangConverter {
     "Tetanus (Wundstarrkrampf)",
     "Tollwut",
     "Typhus",
-    "Varizellen (Windpocken)"
+    "Varizellen (Windpocken)",
+    "Cholera",
+    "Malaria",
+    "Chikungunya"
   ];
 
   static final Map<String, String> diseaseTranslation = {
@@ -75,7 +95,9 @@ class LangConverter {
     "Tetanus": "Tetanus (Wundstarrkrampf)",
     "Rabies": "Tollwut",
     "Typhoid": "Typhus",
-    "Chickenpox (Varicella)": "Varizellen (Windpocken)"
+    "Chickenpox (Varicella)": "Varizellen (Windpocken)",
+    "Cholera": "Cholera",
+    "Malaria": "Malaria",
+    "Chikungunya": "Chikungunya"
   };
-
 }
