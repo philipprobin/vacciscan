@@ -28,24 +28,26 @@ dev_dependencies:
   change_app_package_name: ^1.4.0
 
 flutter_native_splash:
-  color: "#ffffff"  # Hintergrundfarbe des Splash Screens
+  color: "#56c9db"  # Hintergrundfarbe des Splash Screens
   image: assets/icons/app_icon.png  # Pfad zu deinem Bild (z. B. Logo oder Icon)
   android: true
   ios: true
   android_gravity: center  # Position des Bildes auf Android
   ios_content_mode: scaleAspectFill  # Position des Bildes auf iOS
 
-
-
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#56c9db" # Or a specific color for adaptive icons
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+
 
 flutter:
   uses-material-design: true
   assets:
     - .env
+    - assets/icons/app_icon.png
     - assets/icons/app_icon.png
     - lib/assets/vaccine_info/vaccine_info_en.json
     - lib/assets/vaccine_info/vaccine_info_importance.json
