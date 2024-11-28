@@ -1,7 +1,7 @@
 name: VaccineCheck
 description: "A new Flutter project."
 
-version: 1.0.2+3
+version: 1.0.3+4
 
 environment:
   sdk: '>=3.4.4 <4.0.0'

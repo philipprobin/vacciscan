@@ -143,7 +143,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   const Text(
                     "Scan your vaccination certificate",
                     style:
-                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16.0),
                   // Image Grid or Placeholder
